@@ -1,0 +1,52 @@
+---
+
+###
+# Example of the Vagrantfile configuration
+###
+
+# This section is optional
+# It overrides any of the options from the $defaults variable defined in the Vagrantfile
+defaults:
+  box: centos/7
+  group: DefaultGroup
+
+# This section is mandatory
+# It contains list of VMs and their parameters
+vms:
+  # Minimal VM configuration
+  firstvm1: {}
+  # Example of more advanced configuration
+  anothervm2:
+    # Box specific only for this VM
+    box: centos/6
+    # Group can be different for the default group
+    group: NewGroup
+    # List of disk sizes in GBs
+    extra_disks:
+      - 5
+      - 10
+      - 10
+    # Additional port forwarding
+    ports:
+      HTTP:
+        host: 10080
+        guest: 80
+        # Optionally, also protocol can be specified [tcp|udp] - default is tcp
+        #proto: tcp
+    # Explicit IP can be set per VM
+    #ip: 192.168.1.123
+    # Explicit SSH port can be set per VM
+    #ssh_port: 1234
+    # Synced folder can be enabled
+    #synced_folder:
+    #  enabled: yes
+    #  # Optionally define the folders on host and guest
+    #  #host: /tmp
+    #  #guest: /vagrant
+  # Example of Ansible provisioning
+  ansiblevm1:
+    # This can override the "provision_individual: no" and enforce provisioning for this single VM
+    #provision: yes
+    # This can contain any variables for the Ansible provisioner
+    provisioning:
+      playbook: test.yaml
