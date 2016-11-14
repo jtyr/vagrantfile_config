@@ -228,16 +228,16 @@ Vagrant.configure('2') do |config|
                     set_ansible(ansible, prov, name)
                 end
             end
-        end
-    end
 
-    # Provision all hosts
-    if $cfg['vms'].length > 0 and param({}, 'provision_all')
-        prov = param({}, 'provisioning')
+            # Provision all hosts in the last loop
+            if i == $cfg['vms'].size - 1 and param({}, 'provision_all')
+                prov = param({}, 'provisioning')
 
-        config.vm.provision :ansible do |ansible|
-            # Limit it to all defined VMs
-            set_ansible(ansible, prov, "~(%s)" % $cfg['vms'].keys.join('|'))
+                node.vm.provision :ansible do |ansible|
+                    # Limit it to all defined VMs
+                    set_ansible(ansible, prov, "~(%s)" % $cfg['vms'].keys.join('|'))
+                end
+            end
         end
     end
 end
