@@ -24,7 +24,7 @@ $defaults = {
   'extra_disks' => [],
   'group' => nil,
   'box' => 'centos/7',
-  'ip_range' => '192.168.11.%d',
+  'ip_range' => nil,
   'ip_start' => 10,
   'ssh_user' => 'vagrant',
   'ssh_port_start' => 10000,
@@ -144,10 +144,26 @@ Vagrant.configure('2') do |config|
     $cfg['vms'].each_with_index do |(name, p), i|
         config.vm.define name do |node|
             # Configure box
-            node.vm.box = param(p, 'box')
+            box = param(p, 'box')
+
+            if box.instance_of?(String)
+                node.vm.box = param(p, 'box')
+            else
+                node.vm.box = box['name']
+
+                if box.key?('url')
+                    node.vm.box_url = box['url']
+                end
+
+                if box.key?('download_insecure')
+                    node.vm.box_download_insecure = box['download_insecure']
+                end
+            end
 
             # Configure second NIC
-            node.vm.network 'private_network', ip: p['ip'] || (param(p, 'ip_range') % (param(p, 'ip_start') + i))
+            if not param(p, 'ip_range').nil? or p.key?('ip')
+                node.vm.network 'private_network', ip: p['ip'] || (param(p, 'ip_range') % (param(p, 'ip_start') + i))
+            end
 
             # Configure SSH user
             node.ssh.username = param(p, 'ssh_user')

@@ -8,7 +8,14 @@
 # It overrides any of the options from the $defaults variable defined in the Vagrantfile
 defaults:
   box: centos/7
+  #box:
+  #  name: my_centos/7
+  #  url: https://my.server/path/to/the/my_centos7.box
+  #  download_insecure: yes
+  # Group all VMs into this group
   group: DefaultGroup
+  # Automatically assign IPs from this range on the Host-only adapter (second NIC)
+  ip_range: 192.168.10.%d
 
 # This section is mandatory
 # It contains list of VMs and their parameters
