@@ -216,14 +216,14 @@ Vagrant.configure('2') do |config|
                             '--filename', disk_path,
                             '--format', 'VDI',
                             '--size', disk_size * 1024]
+                        v.customize [
+                            'storageattach', :id,
+                            '--storagectl', 'SCSI',
+                            '--device', 0,
+                            '--port', disk_num,
+                            '--type', 'hdd',
+                            '--medium', disk_path]
                     end
-                    v.customize [
-                        'storageattach', :id,
-                        '--storagectl', 'SCSI',
-                        '--device', 0,
-                        '--port', disk_num,
-                        '--type', 'hdd',
-                        '--medium', disk_path]
                 end
 
                 if not param(p, 'group').nil?
