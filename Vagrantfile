@@ -16,23 +16,23 @@ end
 
 # Internal defaults (can be overriden by 'defaults' in the YAML file)
 $defaults = {
-  'provision_individual' => false,
   'provision_all' => false,
-  # The following can also be defined on the VM level
+  'provision_individual' => false,
+  # The following options can also be defined on the VM level
+  'box' => 'centos/7',
   'cpus' => 1,
-  'memory' => 512,
   'extra_disks' => [],
   'group' => nil,
-  'box' => 'centos/7',
+  'gui' => false,
   'ip_range' => nil,
   'ip_start' => 10,
-  'ssh_user' => 'vagrant',
-  'ssh_port_start' => 10000,
+  'memory' => 512,
   'ports' => {},
-  'gui' => false,
   'provisioning' => {
     'verbosity' => 0
   },
+  'ssh_port_start' => 10000,
+  'ssh_user' => 'vagrant',
   'synced_folder' => {
     'enabled' => false,
     'host' => '.',
