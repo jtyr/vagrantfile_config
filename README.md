@@ -185,6 +185,10 @@ default:
             runas: ALL
             tag: NOPASSWD
             cmd: ALL
+    # Define some extra command line parameters for Ansible
+    raw_arguments:
+      - --diff
+      - --forks=10
 
 vms:
   test1:
