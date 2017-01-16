@@ -69,6 +69,8 @@ default:
   # define additional parameters
   box:
     name: centos/7
+    # Box version
+    version: v1611.01
     # Custom URL where to download the box
     url: https://www.server.com/box/centos7.box
     # Disable SSL certificate checking if the cert is self-signed

@@ -151,6 +151,10 @@ Vagrant.configure('2') do |config|
             else
                 node.vm.box = box['name']
 
+                if box.key?('version')
+                    node.vm.box_version = box['version'].to_s
+                end
+
                 if box.key?('url')
                     node.vm.box_url = box['url']
                 end
