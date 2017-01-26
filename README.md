@@ -83,8 +83,14 @@ default:
   ip_start: 50
   # Assign unique SSH port to each of the VMs starting at this number
   ssh_port_start: 10000
-  # User used to connect via SSH
-  ssh_user: vagrant
+  # Optional SSH params
+  ssh:
+    # User used to connect via SSH
+    user: vagrant
+    # User password
+    password: vagrant
+    # Path to the private key
+    private_key: ~/.vagrant.d/insecure_private_key
   # Enable to show the VM gui
   gui: yes
   # Use 2 CPU cores
@@ -123,7 +129,8 @@ vms:
     # It's also possible to define explicit IP
     ip: 192.168.10.3
     # Explicit SSH port can be set per VM
-    ssh_port: 1234
+    ssh:
+      port: 1234
 ```
 
 Example of Ansible provisioning for all VMs:

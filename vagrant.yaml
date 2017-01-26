@@ -42,8 +42,12 @@ vms:
         #proto: tcp
     # Explicit IP can be set per VM
     #ip: 192.168.1.123
-    # Explicit SSH port can be set per VM
-    #ssh_port: 1234
+    # Explicit SSH parameters
+    #ssh:
+    #  port: 1234
+    #  user: vagrant
+    #  password: vagrant
+    #  private_key: ~/.vagrant.d/insecure_private_key
     # Synced folder can be enabled
     #synced_folder:
     #  enabled: yes

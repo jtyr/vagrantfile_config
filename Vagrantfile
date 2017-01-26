@@ -32,7 +32,9 @@ $defaults = {
     'verbosity' => 0
   },
   'ssh_port_start' => 10000,
-  'ssh_user' => 'vagrant',
+  'ssh' => {
+    'user' => 'vagrant'
+  },
   'synced_folder' => {
     'enabled' => false,
     'host' => '.',
@@ -143,9 +145,11 @@ Vagrant.configure('2') do |config|
     # Create individual VMs
     $cfg['vms'].each_with_index do |(name, p), i|
         config.vm.define name do |node|
-            # Configure box
+            # Shortcuts
             box = param(p, 'box')
+            ssh = param(p, 'ssh')
 
+            # Configure box
             if box.instance_of?(String)
                 node.vm.box = param(p, 'box')
             else
@@ -169,14 +173,22 @@ Vagrant.configure('2') do |config|
                 node.vm.network 'private_network', ip: p['ip'] || (param(p, 'ip_range') % (param(p, 'ip_start') + i))
             end
 
-            # Configure SSH user
-            node.ssh.username = param(p, 'ssh_user')
+            # Configure SSH user and password
+            node.ssh.username = ssh['user']
+
+            if p.key?('password')
+                node.ssh.password = ssh['password']
+            end
+
+            if p.key?('private_key')
+                node.ssh.private_key_path = ssh['private_key']
+            end
 
             # Remove the default SSH port forwarding
             node.vm.network :forwarded_port, id: 'ssh', host: 2222, guest: 22, disabled: true
 
             # Define new SSH port forwarding
-            node.ssh.port = p['ssh_port'] || (param(p, 'ssh_port_start') + i)
+            node.ssh.port = ssh['port'] || (param(p, 'ssh_port_start') + i)
             node.vm.network :forwarded_port, id: 'SSH', host: p['ssh_port'] || (param(p, 'ssh_port_start') + i), guest: 22
 
             # Configure shared folder
