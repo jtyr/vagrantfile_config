@@ -16,6 +16,15 @@ defaults:
   group: DefaultGroup
   # Automatically assign IPs from this range on the Host-only adapter (second NIC)
   ip_range: 192.168.10.%d
+  # Assign unique SSH port to each of the VMs starting at this number
+  ssh_port_start: 10000
+  # Provision all VMs with Ansible after each VMs is built
+  provision_individual: yes
+  # Customize the Ansible provisioner
+  privisioning:
+    # Define some extra command line parameters for Ansible
+    raw_arguments:
+      - --diff
 
 # This section is mandatory
 # It contains list of VMs and their parameters
