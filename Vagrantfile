@@ -69,8 +69,8 @@ end
 
 
 def set_ansible(ansible, prov, limit)
-    if prov.key?('ask_sudo_pass')
-        ansible.ask_sudo_pass = prov['ask_sudo_pass']
+    if prov.key?('ask_become_pass')
+        ansible.ask_become_pass = prov['ask_become_pass']
     end
 
     if prov.key?('ask_vault_pass')
@@ -114,10 +114,10 @@ def set_ansible(ansible, prov, limit)
         ansible.start_at_task = prov['start_at_task']
     end
 
-    ansible.sudo = prov['sudo'] || false
+    ansible.become = prov['become'] || false
 
-    if prov.key?('sudo_user')
-        ansible.sudo_user = prov['sudo_user']
+    if prov.key?('become_user')
+        ansible.become_user = prov['become_user']
     end
 
     if prov.key?('tags')
