@@ -135,7 +135,7 @@ end
 
 
 # Minimal Vagrant version
-Vagrant.require_version '>= 1.6.0'
+Vagrant.require_version '>= 2.0.0'
 
 # Using Vagrant config format version 2
 Vagrant.configure('2') do |config|
