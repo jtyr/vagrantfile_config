@@ -77,6 +77,12 @@ def set_ansible(ansible, prov, limit)
         ansible.ask_vault_pass = prov['ask_vault_pass']
     end
 
+    if prov.key?('compatibility_mode')
+        ansible.compatibility_mode = prov['compatibility_mode']
+    else
+        ansible.compatibility_mode = "2.0"
+    end
+
     if prov.key?('extra_vars')
         ansible.extra_vars = prov['extra_vars']
     end
