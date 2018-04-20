@@ -97,6 +97,16 @@ default:
   cpus: 2
   # All VMs will have 1GB of memory
   memory: 1024
+  # Extra disks will use SATA controller
+  storage_controller_type: sata
+  # Name of the controller
+  #storage_controller_type: SATA
+  # Whether to create disk controller
+  #storage_controller_create: yes
+  # Disk device
+  #storage_controller_device: 0
+  # Disk port offset
+  #storage_controller_offset: 0
   # All VMs will have two disks (system disk 20GB, data disk 10GB)
   extra_disks:
     - 20
@@ -107,6 +117,8 @@ default:
     # Optionally define the folders on host and guest
     host: /tmp
     guest: /vagrant
+    #create: no
+    #type: virtualbox
   # Expose some VM ports
   ports:
     # Expose port 80

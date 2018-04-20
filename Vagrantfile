@@ -35,7 +35,14 @@ $defaults = {
   'ssh' => {
     'user' => 'vagrant'
   },
+  'storage_controller_type' => 'scsi',
+  'storage_controller_name' => 'SCSI',
+  'storage_controller_create' => true,
+  'storage_controller_device' => 0,
+  'storage_controller_offset' => 0,
   'synced_folder' => {
+    'create' => false,
+    'type' => 'virtualbox',
     'enabled' => false,
     'host' => '.',
     'guest' => '/vagrant'
@@ -199,7 +206,7 @@ Vagrant.configure('2') do |config|
 
             # Configure shared folder
             sync = param(p, 'synced_folder')
-            node.vm.synced_folder sync['host'], sync['guest'], disabled: (not sync['enabled'])
+            node.vm.synced_folder sync['host'], sync['guest'], disabled: (not sync['enabled']), type: sync['type'], create: sync['create']
 
             # Configure addintional port forwarding
             param(p, 'ports').each do |port_name, ports|
@@ -218,12 +225,12 @@ Vagrant.configure('2') do |config|
                 # Whether to display the VM window
                 v.gui = param(p, 'gui')
 
-                # Create new SCSI controller for additional disks
-                if param(p, 'extra_disks').length > 0
+                # Create new IDE/SCSI/SATA controller for additional disks
+                if param(p, 'extra_disks').length > 0 and param(p, 'storage_controller_create')
                     v.customize [
                         'storagectl', :id,
-                        '--add', 'scsi',
-                        '--name', 'SCSI']
+                        '--add', param(p, 'storage_controller_type').downcase,
+                        '--name', param(p, 'storage_controller_name')]
                 end
 
                 # Add extra disks
@@ -240,9 +247,9 @@ Vagrant.configure('2') do |config|
                             '--size', disk_size * 1024]
                         v.customize [
                             'storageattach', :id,
-                            '--storagectl', 'SCSI',
-                            '--device', 0,
-                            '--port', disk_num,
+                            '--storagectl', param(p, 'storage_controller_name'),
+                            '--device', param(p, 'storage_controller_device'),
+                            '--port', param(p, 'storage_controller_offset') + disk_num,
                             '--type', 'hdd',
                             '--medium', disk_path]
                     end
@@ -260,6 +267,7 @@ Vagrant.configure('2') do |config|
             # Provision individual hosts
             if param({}, 'provision_individual') or (p.key?('provision') and p['provision'])
                 prov = param(p, 'provisioning')
+                print prov
 
                 node.vm.provision :ansible do |ansible|
                     # Limit it to the VMs name by default

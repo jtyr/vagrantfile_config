@@ -37,6 +37,16 @@ vms:
     box: centos/6
     # Group can be different for the default group
     group: NewGroup
+    # Controller type [ide|scsi|sata]
+    #storage_controller_type: sata
+    # Controller name
+    #storage_controller_type: SATA
+    # Whether to create disk controller
+    #storage_controller_create: yes
+    # Disk device
+    #storage_controller_device: 0
+    # Disk port offset
+    #storage_controller_offset: 0
     # List of disk sizes in GBs
     extra_disks:
       - 5
