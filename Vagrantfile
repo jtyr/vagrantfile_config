@@ -267,7 +267,6 @@ Vagrant.configure('2') do |config|
             # Provision individual hosts
             if param({}, 'provision_individual') or (p.key?('provision') and p['provision'])
                 prov = param(p, 'provisioning')
-                print prov
 
                 node.vm.provision :ansible do |ansible|
                     # Limit it to the VMs name by default
