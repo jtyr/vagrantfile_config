@@ -19,6 +19,7 @@ $defaults = {
   'provision_all' => false,
   'provision_individual' => false,
   # The following options can also be defined on the VM level
+  'bootprio' => 0,
   'box' => 'centos/7',
   'cpus' => 1,
   'extra_disks' => [],
@@ -26,6 +27,7 @@ $defaults = {
   'gui' => false,
   'ip_range' => nil,
   'ip_start' => 10,
+  'mac' => nil,
   'memory' => 512,
   'ports' => {},
   'provisioning' => {
@@ -183,7 +185,7 @@ Vagrant.configure('2') do |config|
 
             # Configure second NIC
             if not param(p, 'ip_range').nil? or p.key?('ip')
-                node.vm.network 'private_network', ip: p['ip'] || (param(p, 'ip_range') % (param(p, 'ip_start') + i))
+                node.vm.network 'private_network', ip: p['ip'] || (param(p, 'ip_range') % (param(p, 'ip_start') + i)), mac: p['mac']
             end
 
             # Configure SSH user and password
@@ -262,6 +264,11 @@ Vagrant.configure('2') do |config|
                         '--groups', "/%s" % param(p, 'group')
                     ]
                 end
+
+                # Set priority of the second NIC
+                v.customize [
+                    'modifyvm', :id,
+                    '--nicbootprio2', param(p, 'bootprio')]
             end
 
             # Provision individual hosts

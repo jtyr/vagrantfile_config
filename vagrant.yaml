@@ -61,6 +61,10 @@ vms:
         #proto: tcp
     # Explicit IP can be set per VM
     #ip: 192.168.1.123
+    # Set MAC address of the second NIC
+    #mac: 080027ad3020
+    # Set Boot priority of the second NIC
+    #bootprio: 1
     # Explicit SSH parameters
     #ssh:
     #  port: 1234

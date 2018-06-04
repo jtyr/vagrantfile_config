@@ -131,6 +131,10 @@ default:
     HTTPS:
       host: 10443
       guest: 443
+  # Set MAC address of the second NIC
+  #mac: 080027ad3020
+  # Set Boot priority of the second NIC
+  #bootprio: 1
 
 vms:
   test1: {}
