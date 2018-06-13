@@ -38,7 +38,7 @@ $defaults = {
     'user' => 'vagrant'
   },
   'storage_controller_type' => 'scsi',
-  'storage_controller_name' => 'SCSI',
+  'storage_controller_name' => nil,
   'storage_controller_create' => true,
   'storage_controller_device' => 0,
   'storage_controller_offset' => 0,
@@ -57,7 +57,10 @@ def param(params, p)
         if params[p].instance_of?(Hash)
             tmp = {}
 
-            if $cfg.key?('defaults') and $cfg['defaults'].key?(p) and $cfg['defaults'][p].instance_of?(Hash)
+            if (
+                    $cfg.key?('defaults') and
+                    $cfg['defaults'].key?(p) and
+                    $cfg['defaults'][p].instance_of?(Hash))
                 tmp = $cfg['defaults'][p].clone
             elsif $defaults.key?(p) and $defaults[p].instance_of?(Hash)
                 tmp = $defaults[p].clone
@@ -149,14 +152,145 @@ def set_ansible(ansible, prov, limit)
 end
 
 
+# Manage disks and controllers after the VM exists
+class VagrantPlugins::ProviderVirtualBox::Action::SetName
+  alias_method :original_call, :call
+
+  def call(env)
+    machine = env[:machine]
+    name = machine.name.to_s
+    p = $cfg['vms'][name]
+    driver = machine.provider.driver
+    uuid = driver.instance_eval { @uuid }
+    ui = env[:ui]
+
+    # Create new IDE/SCSI/SATA controller for additional disks
+    if param(p, 'extra_disks').length > 0
+        controller_exists = false
+        controller_name = param(p, 'storage_controller_name')
+        controller_info = driver.execute('showvminfo', uuid, '--machinereadable')
+        lines = controller_info.split("\n")
+
+        if controller_name.nil?
+            # Try to guess the controller to add the disk to
+            controllers = []
+
+            # Get names of existing controllers
+            lines.each do |line|
+                if line.start_with?('storagecontrollername')
+                    controllers.push(line.split('=')[1].gsub('"', ''))
+                end
+            end
+
+            # Search which controller has a disk
+            controllers.each do |controller|
+                disk_found = false
+                stop_searching = false
+
+                lines.each do |line|
+                    k = line.split('=')[0].gsub('"', '')
+                    v = line.split('=')[1].gsub('"', '')
+
+                    if disk_found and v == 'none'
+                        port = k.split('-')[-2].to_i
+                        device = k.split('-')[-1].to_i
+
+                        ui.info "Found empty controller port-device: #{port}-#{device}"
+
+                        p['storage_controller_offset'] = port
+                        p['storage_controller_device'] = device
+                        stop_searching = true
+
+                        break
+                    end
+
+                    if (
+                            k.start_with?("#{controller}-") and (
+                                v.end_with?(".vdi") or
+                                v.end_with?(".vhd") or
+                                v.end_with?(".vmdk")))
+                        ui.info "Disk found on controller: #{controller}"
+
+                        p['storage_controller_name'] = controller
+                        disk_found = true
+                    end
+                end
+
+                if stop_searching
+                    break
+                end
+            end
+        elsif param(p, 'storage_controller_create')
+            # Create a new controller
+            lines.each do |line|
+                if (
+                        line.start_with?('storagecontrollername') and
+                        line.split('=')[1].gsub('"', '') == controller_name)
+                    controller_exists = true
+
+                    break
+                end
+            end
+
+            unless controller_exists
+                ui.info "Creating new controller: #{controller_name}"
+
+                driver.execute(
+                    'storagectl', uuid,
+                    '--add', param(p, 'storage_controller_type').downcase,
+                    '--name', controller_name)
+            end
+        end
+    end
+
+    # Add extra disks
+    param(p, 'extra_disks').each_with_index do |disk_size, disk_num|
+        # Find out folder of VM
+        vm_folder = ""
+        vm_info = driver.execute('showvminfo', uuid, '--machinereadable')
+        lines = vm_info.split("\n")
+
+        lines.each do |line|
+            if line.start_with?("CfgFile")
+                vm_folder = line.split('=')[1].gsub('"', '')
+                vm_folder = File.expand_path("..", vm_folder)
+
+                break
+            end
+        end
+
+        # Define the disk path
+        disk_path = File.join(vm_folder, name, 'extra_disk%d.vdi' % (disk_num + 1))
+
+        # Create and attach the disk
+        unless File.exist?(disk_path)
+            ui.info "Creating new disk: #{disk_size}GB"
+
+            driver.execute(
+                'createhd',
+                '--filename', disk_path,
+                '--format', 'VDI',
+                '--size', (disk_size * 1024).to_s)
+            driver.execute(
+                'storageattach', uuid,
+                '--storagectl', param(p, 'storage_controller_name'),
+                '--device', param(p, 'storage_controller_device').to_s,
+                '--port', (param(p, 'storage_controller_offset') + disk_num).to_s,
+                '--type', 'hdd',
+                '--medium', disk_path)
+        end
+    end
+
+    original_call(env)
+  end
+end
+
+
 # Minimal Vagrant version
 Vagrant.require_version '>= 2.0.0'
 
 # Using Vagrant config format version 2
 Vagrant.configure('2') do |config|
-    # Get the default VM folder
-    vb_machine_folder = (`VBoxManage list systemproperties | grep 'Default machine folder'`).split(':')[1].strip()
-
     # Create individual VMs
     $cfg['vms'].each_with_index do |(name, p), i|
         config.vm.define name do |node|
@@ -227,36 +361,6 @@ Vagrant.configure('2') do |config|
                 # Whether to display the VM window
                 v.gui = param(p, 'gui')
 
-                # Create new IDE/SCSI/SATA controller for additional disks
-                if param(p, 'extra_disks').length > 0 and param(p, 'storage_controller_create')
-                    v.customize [
-                        'storagectl', :id,
-                        '--add', param(p, 'storage_controller_type').downcase,
-                        '--name', param(p, 'storage_controller_name')]
-                end
-
-                # Add extra disks
-                param(p, 'extra_disks').each_with_index do |disk_size, disk_num|
-                    # Define the disk path
-                    disk_path = File.join(vb_machine_folder, v.name, 'extra_disk%d.vdi' % (disk_num + 1))
-
-                    # Create and attach the disk
-                    unless File.exist?(disk_path)
-                        v.customize [
-                            'createhd',
-                            '--filename', disk_path,
-                            '--format', 'VDI',
-                            '--size', disk_size * 1024]
-                        v.customize [
-                            'storageattach', :id,
-                            '--storagectl', param(p, 'storage_controller_name'),
-                            '--device', param(p, 'storage_controller_device'),
-                            '--port', param(p, 'storage_controller_offset') + disk_num,
-                            '--type', 'hdd',
-                            '--medium', disk_path]
-                    end
-                end
-
                 if not param(p, 'group').nil?
                     # Move the VM into the right group
                     v.customize [
@@ -272,7 +376,10 @@ Vagrant.configure('2') do |config|
             end
 
             # Provision individual hosts
-            if param({}, 'provision_individual') or (p.key?('provision') and p['provision'])
+            if (
+                    param({}, 'provision_individual') or (
+                        p.key?('provision') and
+                        p['provision']))
                 prov = param(p, 'provisioning')
 
                 node.vm.provision :ansible do |ansible|
