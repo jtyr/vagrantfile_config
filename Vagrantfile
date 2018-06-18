@@ -260,7 +260,7 @@ class VagrantPlugins::ProviderVirtualBox::Action::SetName
         end
 
         # Define the disk path
-        disk_path = File.join(vm_folder, name, 'extra_disk%d.vdi' % (disk_num + 1))
+        disk_path = File.join(vm_folder, 'extra_disk%d.vdi' % (disk_num + 1))
 
         # Create and attach the disk
         unless File.exist?(disk_path)
