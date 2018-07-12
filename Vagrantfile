@@ -16,6 +16,7 @@ end
 
 # Internal defaults (can be overriden by 'defaults' in the YAML file)
 $defaults = {
+  'env_vars' => {},
   'provision_all' => false,
   'provision_individual' => false,
   # The following options can also be defined on the VM level
@@ -285,6 +286,11 @@ class VagrantPlugins::ProviderVirtualBox::Action::SetName
   end
 end
 
+
+# Set environment variables
+param({}, 'env_vars').each do |(k, v)|
+    ENV[k] = v
+end
 
 # Minimal Vagrant version
 Vagrant.require_version '>= 2.0.0'

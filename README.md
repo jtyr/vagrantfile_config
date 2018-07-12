@@ -135,6 +135,9 @@ default:
   #mac: 080027ad3020
   # Set Boot priority of the second NIC
   #bootprio: 1
+  # Set environment variables
+  #env_vars:
+  #  ANSIBLE_PYTHON_INTERPRETER: /usr/local/bin/python
 
 vms:
   test1: {}
