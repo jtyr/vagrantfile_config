@@ -179,7 +179,7 @@ class VagrantPlugins::ProviderVirtualBox::Action::SetName
             # Get names of existing controllers
             lines.each do |line|
                 if line.start_with?('storagecontrollername')
-                    controllers.push(line.split('=')[1].gsub('"', ''))
+                    controllers.push(line.split('=', 2)[1].gsub('"', ''))
                 end
             end
 
@@ -189,8 +189,14 @@ class VagrantPlugins::ProviderVirtualBox::Action::SetName
                 stop_searching = false
 
                 lines.each do |line|
-                    k = line.split('=')[0].gsub('"', '')
-                    v = line.split('=')[1].gsub('"', '')
+                    kv = line.split('=', 2)
+
+                    if kv.length() != 2
+                        next
+                    end
+
+                    k = kv[0].gsub('"', '')
+                    v = kv[1].gsub('"', '')
 
                     if disk_found and v == 'none'
                         port = k.split('-')[-2].to_i
@@ -226,7 +232,7 @@ class VagrantPlugins::ProviderVirtualBox::Action::SetName
             lines.each do |line|
                 if (
                         line.start_with?('storagecontrollername') and
-                        line.split('=')[1].gsub('"', '') == controller_name)
+                        line.split('=', 2)[1].gsub('"', '') == controller_name)
                     controller_exists = true
 
                     break
@@ -253,7 +259,7 @@ class VagrantPlugins::ProviderVirtualBox::Action::SetName
 
         lines.each do |line|
             if line.start_with?("CfgFile")
-                vm_folder = line.split('=')[1].gsub('"', '')
+                vm_folder = line.split('=', 2)[1].gsub('"', '')
                 vm_folder = File.expand_path("..", vm_folder)
 
                 break
