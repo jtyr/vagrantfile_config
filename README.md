@@ -138,6 +138,10 @@ default:
   # Set environment variables
   #env_vars:
   #  ANSIBLE_PYTHON_INTERPRETER: /usr/local/bin/python
+  # Enable or disable USB
+  #usb: no
+  # Audio setting
+  #audio: none
 
 vms:
   test1: {}

@@ -33,6 +33,8 @@ vms:
   firstvm1: {}
   # Example of more advanced configuration
   anothervm2:
+    # Audio settings
+    #audio: none
     # Box specific only for this VM
     box: centos/6
     # Group can be different for the default group
@@ -77,6 +79,8 @@ vms:
     #  # Optionally define the folders on host and guest
     #  #host: /tmp
     #  #guest: /vagrant
+    # Enable or disable USB
+    #usb: no
   # Example of Ansible provisioning
   ansiblevm1:
     # This can override the "provision_individual: no" and enforce provisioning for this single VM

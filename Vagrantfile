@@ -20,6 +20,7 @@ $defaults = {
   'provision_all' => false,
   'provision_individual' => false,
   # The following options can also be defined on the VM level
+  'audio' => 'none',
   'bootprio' => 0,
   'box' => 'centos/7',
   'cpus' => 1,
@@ -49,7 +50,8 @@ $defaults = {
     'enabled' => false,
     'host' => '.',
     'guest' => '/vagrant'
-  }
+  },
+  'usb' => false
 }
 
 
@@ -372,6 +374,18 @@ Vagrant.configure('2') do |config|
 
                 # Whether to display the VM window
                 v.gui = param(p, 'gui')
+
+                # Enable or disable USB
+                v.customize [
+                    'modifyvm', :id,
+                    '--usb', param(p, 'usb') ? 'on' : 'off'
+                ]
+
+                # Enable or disable audio
+                v.customize [
+                    'modifyvm', :id,
+                    '--audio', param(p, 'audio')
+                ]
 
                 if not param(p, 'group').nil?
                     # Move the VM into the right group
