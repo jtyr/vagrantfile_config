@@ -20,6 +20,8 @@ defaults:
   ssh_port_start: 10000
   # Provision all VMs with Ansible after each VMs is built
   provision_individual: yes
+  # Allow setting hostnames
+  #set_hostname: no
   # Customize the Ansible provisioner
   provisioning:
     # Define some extra command line parameters for Ansible
@@ -30,7 +32,7 @@ defaults:
 # It contains list of VMs and their parameters
 vms:
   # Minimal VM configuration
-  firstvm1: {}
+  firstvm1:
   # Example of more advanced configuration
   anothervm2:
     # Audio settings
@@ -81,6 +83,8 @@ vms:
     #  #guest: /vagrant
     # Enable or disable USB
     #usb: no
+    # Set custom hostname
+    #hostname: anothervm2.local
   # Example of Ansible provisioning
   ansiblevm1:
     # This can override the "provision_individual: no" and enforce provisioning for this single VM

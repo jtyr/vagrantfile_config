@@ -28,7 +28,7 @@ cat > vagrant.yaml <<END
 ---
 
 vms:
-  test: {}
+  test:
 END
 # Run Vagrant to spin up the VM
 vagrant up
@@ -53,7 +53,7 @@ default:
 
 vms:
   # VM test1 has no configuration. The default configuration will be used.
-  test1: {}
+  test1:
   # VM test2 has custom configuration for the box name
   test2:
     box: centos/6
@@ -142,9 +142,11 @@ default:
   #usb: no
   # Audio setting
   #audio: none
+  # Allow setting hostnames
+  #set_hostname: no
 
 vms:
-  test1: {}
+  test1:
   # All default options from above can also be used on the VM level
   test2:
     # For example this VM will have 3 CPU cores
@@ -154,6 +156,8 @@ vms:
     # Explicit SSH port can be set per VM
     ssh:
       port: 1234
+    # Set custom hostname
+    #hostname: test2.local
 ```
 
 Example of Ansible provisioning for all VMs:
@@ -166,8 +170,8 @@ default:
   provision_all: yes
 
 vms:
-  test1: {}
-  test2: {}
+  test1:
+  test2:
 ```
 
 Example of Ansible provisioning for individual VMs:
@@ -180,8 +184,8 @@ default:
   provision_individual: yes
 
 vms:
-  test1: {}
-  test2: {}
+  test1:
+  test2:
 ```
 
 More complex example of Ansible provisioning:
@@ -233,7 +237,7 @@ vms:
         # Then add the "test" group and define the host list for it
         test:
           - test1
-  test2: {}
+  test2:
 ```
 
 

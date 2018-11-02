@@ -35,6 +35,7 @@ $defaults = {
   'provisioning' => {
     'verbosity' => 0
   },
+  'set_hostname' => false,
   'ssh_port_start' => 10000,
   'ssh' => {
     'user' => 'vagrant'
@@ -56,6 +57,11 @@ $defaults = {
 
 
 def param(params, p)
+    # Set parameters to be hash if it's nil
+    if params.nil?
+        params = {}
+    end
+
     if params.key?(p)
         if params[p].instance_of?(Hash)
             tmp = {}
@@ -307,6 +313,11 @@ Vagrant.require_version '>= 2.0.0'
 Vagrant.configure('2') do |config|
     # Create individual VMs
     $cfg['vms'].each_with_index do |(name, p), i|
+        # Set parameters to be hash if it's nil
+        if p.nil?
+            p = {}
+        end
+
         config.vm.define name do |node|
             # Shortcuts
             box = param(p, 'box')
@@ -361,6 +372,15 @@ Vagrant.configure('2') do |config|
             # Configure addintional port forwarding
             param(p, 'ports').each do |port_name, ports|
                 node.vm.network :forwarded_port, id: port_name, host: ports['host'], guest: ports['guest'], protocol: ports['proto'] || 'tcp'
+            end
+
+            # Set hostname
+            if p.key?('set_hostname')
+                if p.key?('hostname')
+                    node.vm.hostname = param(p, 'hostname')
+                else
+                    node.vm.hostname = name
+                end
             end
 
             # Set VM parameters
