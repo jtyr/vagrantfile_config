@@ -75,12 +75,19 @@ vms:
     #  user: vagrant
     #  password: vagrant
     #  private_key: ~/.vagrant.d/insecure_private_key
-    # Synced folder can be enabled
+    # Enable synced folder for Linux guest
     #synced_folder:
     #  enabled: yes
-    #  # Optionally define the folders on host and guest
-    #  #host: /tmp
-    #  #guest: /vagrant
+    #  host: /tmp
+    #  guest: /vagrant
+    # Enable shared folder for Windows guest
+    #synced_folder:
+    #  enabled: yes
+    #  host: .
+    #  guest: /vagrant
+    #  # Options for the 'virtualbox' type
+    #  type_opts:
+    #    automount: yes
     # Enable or disable USB
     #usb: no
     # Set custom hostname

@@ -111,14 +111,21 @@ default:
   extra_disks:
     - 20
     - 10
-  # Enable shared folder
+  # Enable shared folder for Linux guest
   synced_folder:
     enabled: yes
-    # Optionally define the folders on host and guest
     host: /tmp
     guest: /vagrant
     #create: no
     #type: virtualbox
+  # Enable shared folder for Windows guest
+  #synced_folder:
+  #  enabled: yes
+  #  host: .
+  #  guest: /vagrant
+  #  # Options for the 'virtualbox' type
+  #  type_opts:
+  #    automount: yes
   # Expose some VM ports
   ports:
     # Expose port 80
