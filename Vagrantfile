@@ -38,7 +38,9 @@ $defaults = {
   set_hostname: false,
   ssh_port_start: 10000,
   ssh: {
-    user: 'vagrant'
+    user: 'vagrant',
+    password: nil,
+    private_key: nil
   },
   storage_controller_type: 'scsi',
   storage_controller_name: nil,
@@ -354,11 +356,11 @@ Vagrant.configure('2') do |config|
             # Configure SSH user and password
             node.ssh.username = ssh[:user]
 
-            if p.key?('password')
+            if ssh.key?(:password)
                 node.ssh.password = ssh[:password]
             end
 
-            if p.key?('private_key')
+            if ssh.key?(:private_key)
                 node.ssh.private_key_path = ssh[:private_key]
             end
 
