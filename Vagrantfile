@@ -335,21 +335,21 @@ Vagrant.configure('2') do |config|
             else
                 node.vm.box = box[:name]
 
-                if box.key?('version')
+                if box.key?(:version)
                     node.vm.box_version = box[:version].to_s
                 end
 
-                if box.key?('url')
+                if box.key?(:url)
                     node.vm.box_url = box[:url]
                 end
 
-                if box.key?('download_insecure')
+                if box.key?(:download_insecure)
                     node.vm.box_download_insecure = box[:download_insecure]
                 end
             end
 
             # Configure second NIC
-            if not param(p, :ip_range).nil? or p.key?('ip')
+            if not param(p, :ip_range).nil? or p.key?(:ip)
                 node.vm.network 'private_network', ip: p[:ip] || (param(p, :ip_range) % (param(p, :ip_start) + i)), mac: p[:mac]
             end
 
