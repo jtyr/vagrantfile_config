@@ -379,12 +379,10 @@ Vagrant.configure('2') do |config|
             end
 
             # Set hostname
-            if p.key?('set_hostname')
-                if p.key?('hostname')
-                    node.vm.hostname = param(p, :hostname)
-                else
-                    node.vm.hostname = name
-                end
+            if p.key?(:hostname)
+                node.vm.hostname = p[:hostname]
+            elsif param(p, :set_hostname)
+                node.vm.hostname = name
             end
 
             # Set VM parameters
