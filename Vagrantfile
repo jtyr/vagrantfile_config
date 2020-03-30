@@ -38,9 +38,7 @@ $defaults = {
   set_hostname: false,
   ssh_port_start: 10000,
   ssh: {
-    user: 'vagrant',
-    password: nil,
-    private_key: nil
+    user: 'vagrant'
   },
   storage_controller_type: 'scsi',
   storage_controller_name: nil,
