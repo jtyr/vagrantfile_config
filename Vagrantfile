@@ -170,7 +170,7 @@ class VagrantPlugins::ProviderVirtualBox::Action::SetName
 
   def call(env)
     machine = env[:machine]
-    name = machine.name.to_s
+    name = machine.name.to_sym
     p = $cfg[:vms][name]
     driver = machine.provider.driver
     uuid = driver.instance_eval { @uuid }
@@ -381,12 +381,10 @@ Vagrant.configure('2') do |config|
             end
 
             # Set hostname
-            if param(p, :set_hostname) or p.key?(:hostname)
-                if p.key?(:hostname)
-                    node.vm.hostname = param(p, :hostname)
-                else
-                    node.vm.hostname = name
-                end
+            if p.key?(:hostname)
+                node.vm.hostname = p[:hostname]
+            elsif param(p, :set_hostname)
+                node.vm.hostname = name
             end
 
             # Set VM parameters
@@ -430,7 +428,7 @@ Vagrant.configure('2') do |config|
             # Provision individual hosts
             if (
                     param({}, :provision_individual) or (
-                        p.key?('provision') and
+                        p.key?(:provision) and
                         p[:provision]))
                 prov = param(p, :provisioning)
 
