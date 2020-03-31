@@ -168,7 +168,7 @@ class VagrantPlugins::ProviderVirtualBox::Action::SetName
 
   def call(env)
     machine = env[:machine]
-    name = machine.name.to_s
+    name = machine.name.to_sym
     p = $cfg[:vms][name]
     driver = machine.provider.driver
     uuid = driver.instance_eval { @uuid }
@@ -333,32 +333,32 @@ Vagrant.configure('2') do |config|
             else
                 node.vm.box = box[:name]
 
-                if box.key?('version')
+                if box.key?(:version)
                     node.vm.box_version = box[:version].to_s
                 end
 
-                if box.key?('url')
+                if box.key?(:url)
                     node.vm.box_url = box[:url]
                 end
 
-                if box.key?('download_insecure')
+                if box.key?(:download_insecure)
                     node.vm.box_download_insecure = box[:download_insecure]
                 end
             end
 
             # Configure second NIC
-            if not param(p, :ip_range).nil? or p.key?('ip')
+            if not param(p, :ip_range).nil? or p.key?(:ip)
                 node.vm.network 'private_network', ip: p[:ip] || (param(p, :ip_range) % (param(p, :ip_start) + i)), mac: p[:mac]
             end
 
             # Configure SSH user and password
             node.ssh.username = ssh[:user]
 
-            if p.key?('password')
+            if ssh.key?(:password)
                 node.ssh.password = ssh[:password]
             end
 
-            if p.key?('private_key')
+            if ssh.key?(:private_key)
                 node.ssh.private_key_path = ssh[:private_key]
             end
 
@@ -379,12 +379,10 @@ Vagrant.configure('2') do |config|
             end
 
             # Set hostname
-            if p.key?('set_hostname')
-                if p.key?('hostname')
-                    node.vm.hostname = param(p, :hostname)
-                else
-                    node.vm.hostname = name
-                end
+            if p.key?(:hostname)
+                node.vm.hostname = p[:hostname]
+            elsif param(p, :set_hostname)
+                node.vm.hostname = name
             end
 
             # Set VM parameters
@@ -428,7 +426,7 @@ Vagrant.configure('2') do |config|
             # Provision individual hosts
             if (
                     param({}, :provision_individual) or (
-                        p.key?('provision') and
+                        p.key?(:provision) and
                         p[:provision]))
                 prov = param(p, :provisioning)
 
