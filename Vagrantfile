@@ -33,12 +33,12 @@ $defaults = {
   memory: 512,
   ports: {},
   provisioning: {
-    verbosity: 0
+    verbosity: 0,
   },
   set_hostname: false,
   ssh_port_start: 10000,
   ssh: {
-    user: 'vagrant'
+    user: 'vagrant',
   },
   storage_controller_type: 'scsi',
   storage_controller_name: nil,
@@ -51,11 +51,18 @@ $defaults = {
     host: '.',
     guest: '/vagrant',
     type: 'virtualbox',
-    type_opts: {}
+    type_opts: {},
   },
-  usb: false
+  usb: false,
+  usb_version: 1,
 }
 
+# Mapping of the USB version to the USB cmdline switch
+$usb_mapping = {
+    1 => '--usb',
+    2 => '--usbehci',
+    3 => '--usbxhci',
+}
 
 def param(params, p)
     # Set parameters to be hash if it's nil
@@ -400,7 +407,7 @@ Vagrant.configure('2') do |config|
                 # Enable or disable USB
                 v.customize [
                     'modifyvm', :id,
-                    '--usb', param(p, :usb) ? 'on' : 'off'
+                    $usb_mapping[param(p, :usb_version)], param(p, :usb) ? 'on' : 'off'
                 ]
 
                 # Enable or disable audio

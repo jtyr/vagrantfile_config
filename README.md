@@ -147,6 +147,8 @@ default:
   #  ANSIBLE_PYTHON_INTERPRETER: /usr/local/bin/python
   # Enable or disable USB
   #usb: no
+  # Specify USB version [1|2|3]
+  #usb_version: 1
   # Audio setting
   #audio: none
   # Allow setting hostnames
